@@ -1,4 +1,11 @@
 fastapi
 uvicorn[standard]
-pydantic
+pydantic[email]
+pydantic-settings
+SQLAlchemy
+passlib[bcrypt]
+python-jose
+python-multipart
+
+
 

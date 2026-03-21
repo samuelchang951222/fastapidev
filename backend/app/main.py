@@ -1,35 +1,52 @@
-from __future__ import annotations
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import categories, flash_sales, products
+# Import routers (modular endpoints)
+from .routers import auth, categories, products, orders, flash_sales
 
+# Import database and seed logic
+from .db import engine, SessionLocal
+from .models import Base
+from .services.seed_db import seed_if_empty
+from .settings import settings
 
-def create_app() -> FastAPI:
-    app = FastAPI(title="鮮採市集 API", version="0.1.0")
+def create_app() -> FastAPI: 
+    app = FastAPI(title="E-Commerce API", version="1.0.0")
 
+    # CORS setup - allow frontend to access API
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[
-            "http://localhost:5173",
-            "http://127.0.0.1:5173",
-        ],
+        allow_origins=settings.CORS_ORIGINS,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
 
+    # Startup event: create tables and seed DB 
+    @app.on_event("startup")
+    def on_startup():
+        Base.metadata.create_all(bind=engine)
+        if settings.ENABLE_DB_SEED:
+            with SessionLocal() as db:
+                seed_if_empty(db)
+
+    # Health check endpoint 
     @app.get("/health")
-    def health() -> dict:
+    def health():
         return {"ok": True}
 
-    app.include_router(categories.router)
-    app.include_router(products.router)
-    app.include_router(flash_sales.router)
+    # Root endpoint 
+    @app.get("/")
+    def root():
+        return {"message": "hello world"}
+
+    # Register routers 
+    app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
+    app.include_router(categories.router, prefix="/api/categories", tags=["categories"])
+    app.include_router(products.router, prefix="/api/products", tags=["products"])
+    app.include_router(orders.router, prefix="/api/orders", tags=["orders"])
+    app.include_router(flash_sales.router, prefix="/api/flash-sales", tags=["flash-sales"])
 
     return app
 
-
 app = create_app()
-

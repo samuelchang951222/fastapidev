@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 
 
 class Category(BaseModel):
@@ -31,4 +31,58 @@ class Product(BaseModel):
 class FlashSaleItem(BaseModel):
     productId: int
     label: Optional[str] = None
+
+
+class UserBase(BaseModel):
+    email: EmailStr
+    name: str
+
+
+class UserCreate(UserBase):
+    password: str
+
+
+class UserOut(UserBase):
+    id: int
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+
+class TokenPayload(BaseModel):
+    sub: str
+    exp: int
+
+
+class OrderItemCreate(BaseModel):
+    productId: int
+    quantity: int
+
+
+class OrderCreate(BaseModel):
+    recipientName: str
+    phone: str
+    address: str
+    items: List[OrderItemCreate]
+
+
+class OrderItemOut(BaseModel):
+    productId: int
+    productName: str
+    unitPrice: int
+    quantity: int
+    subtotal: int
+
+
+class OrderOut(BaseModel):
+    id: int
+    totalPrice: int
+    createdAt: int
+    recipientName: str
+    phone: str
+    address: str
+    items: List[OrderItemOut]
+
 

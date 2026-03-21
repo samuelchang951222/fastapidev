@@ -2,30 +2,16 @@ from __future__ import annotations
 
 from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import desc, or_
+from sqlalchemy.orm import Session
 
-from ..data.seed import PRODUCTS
+from ..db import get_db
+from ..models import Category as CategoryModel
+from ..models import Product as ProductModel
 from ..schemas import Product
 
 router = APIRouter(prefix="/api", tags=["products"])
-
-
-def _matches_q(p: dict, q: str) -> bool:
-    if not q:
-        return True
-    needle = q.strip().lower()
-    hay = f"{p.get('name','')} {p.get('description','')} {p.get('categoryName','')}".lower()
-    return needle in hay
-
-
-def _sort(products: list[dict], sort: str) -> list[dict]:
-    if sort == "priceAsc":
-        return sorted(products, key=lambda x: int(x.get("price") or 0))
-    if sort == "priceDesc":
-        return sorted(products, key=lambda x: int(x.get("price") or 0), reverse=True)
-    if sort == "newest":
-        return sorted(products, key=lambda x: int(x.get("createdAt") or 0), reverse=True)
-    return sorted(products, key=lambda x: int(x.get("featuredRank") or 0), reverse=True)
 
 
 @router.get("/products", response_model=List[Product])
@@ -33,20 +19,81 @@ def list_products(
     category: Optional[str] = Query(default=None),
     q: Optional[str] = Query(default=None),
     sort: str = Query(default="featured"),
+    db: Session = Depends(get_db),
 ) -> List[Product]:
-    items = PRODUCTS
+    query = db.query(ProductModel, CategoryModel).join(
+        CategoryModel, ProductModel.category_slug == CategoryModel.slug
+    )
+
     if category and category != "all":
-        items = [p for p in items if p.get("categorySlug") == category]
+        query = query.filter(ProductModel.category_slug == category)
+
     if q:
-        items = [p for p in items if _matches_q(p, q)]
-    items = _sort(items, sort)
-    return [Product(**p) for p in items]
+        needle = f"%{q.strip()}%"
+        query = query.filter(
+            or_(
+                ProductModel.name.like(needle),
+                ProductModel.description.like(needle),
+                CategoryModel.name.like(needle),
+            )
+        )
+
+    if sort == "priceAsc":
+        query = query.order_by(ProductModel.price.asc())
+    elif sort == "priceDesc":
+        query = query.order_by(ProductModel.price.desc())
+    elif sort == "newest":
+        query = query.order_by(desc(ProductModel.created_at))
+    else:
+        query = query.order_by(desc(ProductModel.featured_rank))
+
+    rows = query.all()
+    return [
+        Product(
+            id=p.id,
+            name=p.name,
+            categorySlug=p.category_slug,
+            categoryName=c.name,
+            description=p.description,
+            price=p.price,
+            compareAtPrice=p.compare_at_price,
+            badge=p.badge,
+            imageUrl=p.image_url,
+            stock=p.stock,
+            unit=p.unit,
+            createdAt=p.created_at,
+            featuredRank=p.featured_rank,
+            isWeeklyPick=p.is_weekly_pick,
+        )
+        for (p, c) in rows
+    ]
 
 
 @router.get("/products/{product_id}", response_model=Product)
-def get_product(product_id: int) -> Product:
-    for p in PRODUCTS:
-        if int(p.get("id")) == product_id:
-            return Product(**p)
-    raise HTTPException(status_code=404, detail="Product not found")
+def get_product(product_id: int, db: Session = Depends(get_db)) -> Product:
+    row = (
+        db.query(ProductModel, CategoryModel)
+        .join(CategoryModel, ProductModel.category_slug == CategoryModel.slug)
+        .filter(ProductModel.id == product_id)
+        .first()
+    )
+    if not row:
+        raise HTTPException(status_code=404, detail="Product not found")
+    p, c = row
+    return Product(
+        id=p.id,
+        name=p.name,
+        categorySlug=p.category_slug,
+        categoryName=c.name,
+        description=p.description,
+        price=p.price,
+        compareAtPrice=p.compare_at_price,
+        badge=p.badge,
+        imageUrl=p.image_url,
+        stock=p.stock,
+        unit=p.unit,
+        createdAt=p.created_at,
+        featuredRank=p.featured_rank,
+        isWeeklyPick=p.is_weekly_pick,
+    )
 
