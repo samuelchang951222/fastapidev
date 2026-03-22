@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.routers import ecpay
+
 # Import routers (modular endpoints)
-from .routers import auth, categories, products, orders, flash_sales
+from .routers import auth, categories, products, orders, flash_sales, ecpay
 
 # Import database and seed logic
 from .db import engine, SessionLocal
@@ -41,12 +43,12 @@ def create_app() -> FastAPI:
         return {"message": "hello world"}
 
     # Register routers 
-    app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
-    app.include_router(categories.router, prefix="/api/categories", tags=["categories"])
-    app.include_router(products.router, prefix="/api/products", tags=["products"])
-    app.include_router(orders.router, prefix="/api/orders", tags=["orders"])
-    app.include_router(flash_sales.router, prefix="/api/flash-sales", tags=["flash-sales"])
-
+    app.include_router(auth.router, tags=["auth"])
+    app.include_router(categories.router, tags=["categories"])
+    app.include_router(products.router, tags=["products"])
+    app.include_router(orders.router, tags=["orders"])
+    app.include_router(flash_sales.router, tags=["flash-sales"])
+    # app.include_router(ecpay.router, prefix="/api/ecpay", tags=["ecpay"])
     return app
 
 app = create_app()
