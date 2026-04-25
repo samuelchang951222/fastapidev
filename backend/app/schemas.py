@@ -62,9 +62,10 @@ class OrderItemCreate(BaseModel):
 
 
 class OrderCreate(BaseModel):
-    recipientName: str
-    phone: str
-    address: str
+    recipientName: str = Field(..., min_length=1, description="收件人姓名（必填）")
+    phone: str = Field(..., pattern=r"^09\d{8}$", description="收件人電話（必填，格式：09xxxxxxxx）")
+    address1: str = Field(..., min_length=1, description="收件人地址一（必填）")
+    address2: Optional[str] = Field(None, description="收件人地址二（選填）")
     items: List[OrderItemCreate]
 
 
@@ -82,7 +83,8 @@ class OrderOut(BaseModel):
     createdAt: int
     recipientName: str
     phone: str
-    address: str
+    address1: str
+    address2: Optional[str] = None
     items: List[OrderItemOut]
 
 

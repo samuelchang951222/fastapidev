@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 # 假設這些依賴已在你的專案中定義
 from app import models, schemas
 from app.auth import get_current_user
-from app.data import get_db
+from app.db import get_db
 
 router = APIRouter(prefix="/api/ecpay", tags=["ECPay"])
 
@@ -64,7 +64,8 @@ async def ecpay_checkout(order_data: schemas.OrderCreate, current_user: schemas.
             user_id=current_user.id,
             recipient_name=order_data.recipientName,
             phone=order_data.phone,
-            address=order_data.address,
+            address1=order_data.address1,
+            address2=order_data.address2,
             total_price=total_price,
             created_at=int(time.time()),
             payment_status="UNPAID",
@@ -84,6 +85,7 @@ async def ecpay_checkout(order_data: schemas.OrderCreate, current_user: schemas.
         db.rollback() # 若發生預期內的錯誤（如庫存不足），復原所有資料庫操作
         raise
     except Exception as e:
+        print(f"Error in checkout: {e}")
         db.rollback() # 若發生未預期錯誤，復原操作避免產生髒資料
         raise HTTPException(status_code=500, detail="訂單建立失敗")
 

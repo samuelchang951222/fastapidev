@@ -33,7 +33,8 @@ def create_order(
         user_id=current_user.id,
         recipient_name=payload.recipientName,
         phone=payload.phone,
-        address=payload.address,
+        address1=payload.address1,
+        address2=payload.address2,
         total_price=0,
         created_at=int(time.time()),
     )
@@ -82,7 +83,8 @@ def create_order(
         createdAt=order.created_at,
         recipientName=order.recipient_name,
         phone=order.phone,
-        address=order.address,
+        address1=order.address1,
+        address2=order.address2,
         items=items_out,
     )
 
@@ -119,7 +121,8 @@ def list_my_orders(
                 createdAt=order.created_at,
                 recipientName=order.recipient_name,
                 phone=order.phone,
-                address=order.address,
+                address1=order.address1,
+                address2=order.address2,
                 items=items_out,
             )
         )

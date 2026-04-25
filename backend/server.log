@@ -1,0 +1,321 @@
+INFO:     Started server process [31689]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:50556 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50560 - "POST /api/orders HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.UndefinedColumn: column "address1" of relation "orders" does not exist
+LINE 1: ...SERT INTO orders (user_id, recipient_name, phone, address1, ...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/uvicorn/protocols/http/httptools_impl.py", line 415, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/fastapi/applications.py", line 1138, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/fastapi/routing.py", line 121, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/fastapi/routing.py", line 107, in app
+    response = await f(request)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/fastapi/routing.py", line 426, in app
+    raw_response = await run_endpoint_function(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/fastapi/routing.py", line 316, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/concurrency.py", line 38, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/anyio/to_thread.py", line 63, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/anyio/_backends/_asyncio.py", line 2502, in run_sync_in_worker_thread
+    return await future
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/anyio/_backends/_asyncio.py", line 986, in run
+    result = context.run(func, *args)
+  File "/Users/samuel/user/fastapidev/backend/app/routers/orders.py", line 42, in create_order
+    db.flush()
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/orm/session.py", line 4331, in flush
+    self._flush(objects)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/orm/session.py", line 4467, in _flush
+    transaction.rollback(_capture_exception=True)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/langhelpers.py", line 121, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/orm/session.py", line 4427, in _flush
+    flush_context.execute()
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/orm/unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/orm/unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/orm/persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/orm/persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedColumn) column "address1" of relation "orders" does not exist
+LINE 1: ...SERT INTO orders (user_id, recipient_name, phone, address1, ...
+                                                             ^
+
+[SQL: INSERT INTO orders (user_id, recipient_name, phone, address1, address2, total_price, created_at, payment_status, trade_no, payment_method) VALUES (%(user_id)s, %(recipient_name)s, %(phone)s, %(address1)s, %(address2)s, %(total_price)s, %(created_at)s, %(payment_status)s, %(trade_no)s, %(payment_method)s) RETURNING orders.id]
+[parameters: {'user_id': 2, 'recipient_name': 'Test User', 'phone': '0912345678', 'address1': '台北市信義區忠孝東路100號', 'address2': '3樓之1', 'total_price': 0, 'created_at': 1777104116, 'payment_status': 'UNPAID', 'trade_no': None, 'payment_method': 'ecpay'}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+INFO:     127.0.0.1:50565 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50569 - "POST /api/orders HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.UndefinedColumn: column "address1" of relation "orders" does not exist
+LINE 1: ...SERT INTO orders (user_id, recipient_name, phone, address1, ...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/uvicorn/protocols/http/httptools_impl.py", line 415, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/fastapi/applications.py", line 1138, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/fastapi/routing.py", line 121, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/fastapi/routing.py", line 107, in app
+    response = await f(request)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/fastapi/routing.py", line 426, in app
+    raw_response = await run_endpoint_function(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/fastapi/routing.py", line 316, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/concurrency.py", line 38, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/anyio/to_thread.py", line 63, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/anyio/_backends/_asyncio.py", line 2502, in run_sync_in_worker_thread
+    return await future
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/anyio/_backends/_asyncio.py", line 986, in run
+    result = context.run(func, *args)
+  File "/Users/samuel/user/fastapidev/backend/app/routers/orders.py", line 42, in create_order
+    db.flush()
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/orm/session.py", line 4331, in flush
+    self._flush(objects)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/orm/session.py", line 4467, in _flush
+    transaction.rollback(_capture_exception=True)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/langhelpers.py", line 121, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/orm/session.py", line 4427, in _flush
+    flush_context.execute()
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/orm/unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/orm/unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/orm/persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/orm/persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedColumn) column "address1" of relation "orders" does not exist
+LINE 1: ...SERT INTO orders (user_id, recipient_name, phone, address1, ...
+                                                             ^
+
+[SQL: INSERT INTO orders (user_id, recipient_name, phone, address1, address2, total_price, created_at, payment_status, trade_no, payment_method) VALUES (%(user_id)s, %(recipient_name)s, %(phone)s, %(address1)s, %(address2)s, %(total_price)s, %(created_at)s, %(payment_status)s, %(trade_no)s, %(payment_method)s) RETURNING orders.id]
+[parameters: {'user_id': 2, 'recipient_name': 'Test User', 'phone': '0912345678', 'address1': '台北市信義區忠孝東路100號', 'address2': '3樓之1', 'total_price': 0, 'created_at': 1777104146, 'payment_status': 'UNPAID', 'trade_no': None, 'payment_method': 'ecpay'}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+INFO:     127.0.0.1:50581 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50584 - "POST /api/orders HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.NotNullViolation: null value in column "address" of relation "orders" violates not-null constraint
+DETAIL:  Failing row contains (3, 2, 王小明, 0912345678, null, 0, 1777104212, UNPAID, null, ecpay, 台北市信義區忠孝東路100號, 3樓之1).
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/uvicorn/protocols/http/httptools_impl.py", line 415, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/fastapi/applications.py", line 1138, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/fastapi/routing.py", line 121, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/fastapi/routing.py", line 107, in app
+    response = await f(request)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/fastapi/routing.py", line 426, in app
+    raw_response = await run_endpoint_function(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/fastapi/routing.py", line 316, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/starlette/concurrency.py", line 38, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/anyio/to_thread.py", line 63, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/anyio/_backends/_asyncio.py", line 2502, in run_sync_in_worker_thread
+    return await future
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/anyio/_backends/_asyncio.py", line 986, in run
+    result = context.run(func, *args)
+  File "/Users/samuel/user/fastapidev/backend/app/routers/orders.py", line 42, in create_order
+    db.flush()
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/orm/session.py", line 4331, in flush
+    self._flush(objects)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/orm/session.py", line 4467, in _flush
+    transaction.rollback(_capture_exception=True)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/util/langhelpers.py", line 121, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/orm/session.py", line 4427, in _flush
+    flush_context.execute()
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/orm/unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/orm/unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/orm/persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/orm/persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/samuel/Library/Python/3.9/lib/python/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.NotNullViolation) null value in column "address" of relation "orders" violates not-null constraint
+DETAIL:  Failing row contains (3, 2, 王小明, 0912345678, null, 0, 1777104212, UNPAID, null, ecpay, 台北市信義區忠孝東路100號, 3樓之1).
+
+[SQL: INSERT INTO orders (user_id, recipient_name, phone, address1, address2, total_price, created_at, payment_status, trade_no, payment_method) VALUES (%(user_id)s, %(recipient_name)s, %(phone)s, %(address1)s, %(address2)s, %(total_price)s, %(created_at)s, %(payment_status)s, %(trade_no)s, %(payment_method)s) RETURNING orders.id]
+[parameters: {'user_id': 2, 'recipient_name': '王小明', 'phone': '0912345678', 'address1': '台北市信義區忠孝東路100號', 'address2': '3樓之1', 'total_price': 0, 'created_at': 1777104212, 'payment_status': 'UNPAID', 'trade_no': None, 'payment_method': 'ecpay'}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+INFO:     127.0.0.1:50592 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50595 - "POST /api/orders HTTP/1.1" 201 Created
+INFO:     127.0.0.1:50599 - "POST /api/orders HTTP/1.1" 201 Created
+INFO:     127.0.0.1:50602 - "POST /api/orders HTTP/1.1" 422 Unprocessable Entity
