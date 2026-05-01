@@ -1,11 +1,11 @@
+"""
+產品路由
+"""
 from __future__ import annotations
-
 from typing import List, Optional
-
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import desc, or_
 from sqlalchemy.orm import Session
-
 from ..db import get_db
 from ..models import Category as CategoryModel
 from ..models import Product as ProductModel

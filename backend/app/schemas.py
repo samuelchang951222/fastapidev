@@ -1,7 +1,8 @@
+"""
+Pydantic 模型
+"""
 from __future__ import annotations
-
 from typing import List, Optional
-
 from pydantic import BaseModel, Field, EmailStr
 
 
@@ -23,7 +24,7 @@ class Product(BaseModel):
     imageUrl: Optional[str] = None
     stock: int = 0
     unit: str = "份"
-    createdAt: int = Field(default=0, description="Unix epoch seconds (UI sorting only)")
+    createdAt: int = Field(default=0, description="Unix 時間戳")
     featuredRank: int = 0
     isWeeklyPick: bool = False
 
@@ -42,7 +43,7 @@ class UserCreate(UserBase):
     password: str
 
 
-class UserOut(UserBase):
+class UserOut(BaseModel):
     id: int
 
 
@@ -62,10 +63,10 @@ class OrderItemCreate(BaseModel):
 
 
 class OrderCreate(BaseModel):
-    recipientName: str = Field(..., min_length=1, description="收件人姓名（必填）")
-    phone: str = Field(..., pattern=r"^09\d{8}$", description="收件人電話（必填，格式：09xxxxxxxx）")
-    address1: str = Field(..., min_length=1, description="收件人地址一（必填）")
-    address2: Optional[str] = Field(None, description="收件人地址二（選填）")
+    recipientName: str = Field(..., min_length=1)
+    phone: str = Field(..., pattern=r"^09\d{8}$")
+    address1: str = Field(..., min_length=1)
+    address2: Optional[str] = None
     items: List[OrderItemCreate]
 
 

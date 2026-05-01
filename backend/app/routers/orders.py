@@ -1,11 +1,11 @@
+"""
+訂單路由
+"""
 from __future__ import annotations
-
 import time
 from typing import List
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-
 from ..auth import get_current_user
 from ..db import get_db
 from ..models import Order as OrderModel

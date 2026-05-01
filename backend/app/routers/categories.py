@@ -1,10 +1,10 @@
+"""
+分類路由
+"""
 from __future__ import annotations
-
 from typing import List
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-
 from ..db import get_db
 from ..models import Category as CategoryModel
 from ..schemas import Category

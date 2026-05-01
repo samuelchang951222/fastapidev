@@ -1,7 +1,8 @@
+"""
+資料庫初始化
+"""
 from __future__ import annotations
-
 from sqlalchemy.orm import Session
-
 from ..data.seed import CATEGORIES, FLASH_SALES, PRODUCTS
 from ..models import Category, FlashSale, Product
 

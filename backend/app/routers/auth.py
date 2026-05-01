@@ -1,9 +1,10 @@
+"""
+認證路由
+"""
 from __future__ import annotations
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-
 from ..auth import create_access_token, get_current_user, hash_password, verify_password
 from ..db import get_db
 from ..models import User as UserModel

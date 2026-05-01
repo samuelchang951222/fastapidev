@@ -1,3 +1,6 @@
+"""
+綠界支付路由
+"""
 import hashlib
 import urllib.parse
 import time
@@ -6,8 +9,6 @@ from datetime import datetime
 from fastapi import APIRouter, Request, HTTPException, Depends
 from fastapi.responses import PlainTextResponse, HTMLResponse
 from sqlalchemy.orm import Session
-
-# 假設這些依賴已在你的專案中定義
 from app import models, schemas
 from app.auth import get_current_user
 from app.db import get_db
@@ -18,32 +19,25 @@ HASH_KEY = "5294y06JbISpM5x9"
 HASH_IV = "v77hoKGq4kWxNNIS"
 MERCHANT_ID = "2000132"
 
+
 def calculate_check_mac_value(data: dict) -> str:
-    """精確計算步驟：統一處理簽章生成與驗證"""
-    # 1. 字典推導式：安全地排除 CheckMacValue，不改動原始資料
     filtered_data = {k: v for k, v in data.items() if k != "CheckMacValue"}
-    # 2. 參數排序 (字典序 A-Z)
     sorted_keys = sorted(filtered_data.keys())
-    # 3. 字串拼接
     query_str = "&".join([f"{k}={filtered_data[k]}" for k in sorted_keys])
-    # 4. 加入 Key 與 IV
     raw_str = f"HashKey={HASH_KEY}&{query_str}&HashIV={HASH_IV}"
-    # 5. URL Encode 與綠界專屬替換規則
     url_encoded = urllib.parse.quote_plus(raw_str).replace("%20", "+")
     url_encoded = url_encoded.replace("%2D", "-").replace("%5F", "_").replace("%2E", ".").replace("%21", "!")
-    # 6. 轉小寫、SHA256 加密、轉大寫
     return hashlib.sha256(url_encoded.lower().encode("utf-8")).hexdigest().upper()
 
 
 @router.post("/checkout")
 async def ecpay_checkout(order_data: schemas.OrderCreate, current_user: schemas.UserOut = Depends(get_current_user), db: Session = Depends(get_db)):
-    # 生成極低重複率的訂單編號：OD + 年月日時分秒 + 4碼隨機英數
     trade_no = f"OD{datetime.now().strftime('%Y%m%d%H%M%S')}{uuid.uuid4().hex[:4].upper()}"
     trade_date = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     total_price = 0
     order_items = []
 
-    try: # 開啟資料庫保護傘
+    try:
         for item in order_data.items:
             product = db.query(models.Product).filter(models.Product.id == item.productId).first()
             if not product:
@@ -52,7 +46,6 @@ async def ecpay_checkout(order_data: schemas.OrderCreate, current_user: schemas.
                 raise HTTPException(status_code=400, detail=f"商品 {product.name} 庫存不足")
             
             total_price += product.price * item.quantity
-            # 先將明細存入記憶體陣列，提升處理效率
             order_items.append(models.OrderItem(
                 product_id=product.id,
                 product_name=product.name,
@@ -73,10 +66,10 @@ async def ecpay_checkout(order_data: schemas.OrderCreate, current_user: schemas.
             payment_method="ecpay"
         )
         db.add(order)
-        db.flush() # 將 order 送入 DB 以獲取自動遞增的 ID，但尚未永久寫入
+        db.flush()
 
         for order_item in order_items:
-            order_item.order_id = order.id # 綁定剛剛產生的主檔 ID
+            order_item.order_id = order.id
             db.add(order_item)
 
         db.commit() # 一切無誤，將主檔與明細一併永久寫入
