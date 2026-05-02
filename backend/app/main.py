@@ -1,9 +1,16 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
-from .routers import categories, flash_sales, products
+from supabase import create_client
+
+from .routers import auth, categories, flash_sales, orders, products
+from .supabase_config import SUPABASE_KEY, SUPABASE_URL
 
 
 def create_app() -> FastAPI:
@@ -24,12 +31,50 @@ def create_app() -> FastAPI:
     def health() -> dict:
         return {"ok": True}
 
+    app.include_router(auth.router)
     app.include_router(categories.router)
     app.include_router(products.router)
     app.include_router(flash_sales.router)
+    app.include_router(orders.router)
+
+    # ── 正式上線：FastAPI 直接 serve 前端 build 好的靜態檔 ──
+    build_dir = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
+    if build_dir.exists():
+        # 先掛載靜態檔（JS、CSS、圖片等）
+        app.mount(
+            "/assets",
+            StaticFiles(directory=str(build_dir / "assets")),
+            name="assets",
+        )
+        # SPA fallback — 所有非 API 路由都導到 index.html
+        @app.get("/{full_path:path}")
+        async def spa_fallback(full_path: str):
+            # API / health 路由不要攔
+            if full_path.startswith(("api/", "health")):
+                return JSONResponse(status_code=404, content={"detail": "Not Found"})
+            # 有實際檔案的也先放行
+            static_file = build_dir / full_path
+            if static_file.exists() and static_file.is_file():
+                return FileResponse(str(static_file))
+            # 其餘一律回 index.html（Vue Router SPA）
+            return FileResponse(str(build_dir / "index.html"))
+
+        print(f"✅ 前端靜態檔已掛載 ({build_dir})")
 
     return app
 
 
 app = create_app()
+
+# ── 啟動時補上訪客使用者（讓訂單外鍵不炸） ──
+try:
+    sb = create_client(SUPABASE_URL, SUPABASE_KEY)
+    # 直接 upsert，id=0 已存在就不動
+    sb.table("users").upsert(
+        {"id": 0, "name": "訪客", "email": "guest@local", "hashed_password": "no-auth"},
+        on_conflict="id"
+    ).execute()
+except Exception:
+    pass
+
 

@@ -32,3 +32,29 @@ class FlashSaleItem(BaseModel):
     productId: int
     label: Optional[str] = None
 
+
+class OrderItem(BaseModel):
+    productId: int
+    productName: str
+    price: int
+    quantity: int
+
+
+class CreateOrderRequest(BaseModel):
+    name: str
+    phone: str
+    address: str
+    items: list[OrderItem]
+    total: int
+
+
+class Order(BaseModel):
+    id: int
+    name: str
+    phone: str
+    address: str
+    items: list[OrderItem]
+    total: int
+    status: str = "pending"
+    createdAt: int
+

@@ -1,13 +1,23 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useCartStore } from '../stores/cart'
+import { useAuthStore } from '../stores/auth'
+import { apiPost } from '../api/client'
 import BaseButton from '../components/ui/BaseButton.vue'
 
+const router = useRouter()
 const cart = useCartStore()
+const auth = useAuthStore()
 
 const name = ref('')
 const phone = ref('')
 const address = ref('')
+const saveInfo = ref(true)
+const submitting = ref(false)
+const savingProfile = ref(false)
+const error = ref('')
+const profileSaved = ref(false)
 
 const total = computed(() => cart.totalPrice)
 
@@ -15,10 +25,61 @@ function fmt(n) {
   return `NT$ ${Number(n || 0).toLocaleString('zh-TW')}`
 }
 
-function submit() {
-  // UI only
-  cart.clear()
-  alert('已送出訂單（示意）')
+// 登入後自動帶入使用者資料
+onMounted(async () => {
+  if (auth.isLoggedIn) {
+    // 確保資料最新
+    await auth.fetchMe()
+    name.value = auth.userName
+    phone.value = auth.userPhone
+    address.value = auth.userAddress
+  }
+})
+
+async function submit() {
+  if (cart.totalCount === 0) return
+  submitting.value = true
+  error.value = ''
+  profileSaved.value = false
+
+  try {
+    // 送出訂單
+    const order = await apiPost('/api/orders', {
+      name: name.value,
+      phone: phone.value,
+      address: address.value,
+      items: cart.itemList.map(it => ({
+        productId: it.product.id,
+        productName: it.product.name,
+        price: it.product.price,
+        quantity: it.quantity,
+      })),
+      total: total.value,
+    })
+
+    // 儲存收件資訊到個人檔案
+    if (saveInfo.value && auth.isLoggedIn) {
+      try {
+        savingProfile.value = true
+        await auth.updateProfile({
+          name: name.value,
+          phone: phone.value,
+          address: address.value,
+        })
+      } catch {
+        // 儲存失敗不影響訂單
+      }
+    }
+
+    cart.clear()
+    alert(`✅ 訂單已送出！訂單編號 #${order.id}`)
+    router.push('/')
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : '送出失敗'
+  } finally {
+    submitting.value = false
+    savingProfile.value = false
+  }
 }
 </script>
 
@@ -42,7 +103,14 @@ function submit() {
               <span class="label">地址</span>
               <input v-model="address" class="input" required />
             </label>
-            <BaseButton variant="neutral" class="submitBtn">送出訂單</BaseButton>
+            <label v-if="auth.isLoggedIn" class="saveCheck">
+              <input v-model="saveInfo" type="checkbox" />
+              儲存收件資訊到我的帳號
+            </label>
+            <p v-if="error" class="error">{{ error }}</p>
+            <BaseButton variant="neutral" type="submit" class="submitBtn" :disabled="submitting || cart.totalCount === 0">
+              {{ submitting ? '送出中…' : '送出訂單' }}
+            </BaseButton>
           </form>
         </section>
 
@@ -134,6 +202,27 @@ function submit() {
   height: 46px;
 }
 
+.error {
+  color: #e53e3e;
+  font-weight: 800;
+  font-size: 13px;
+  margin: 0;
+}
+
+.saveCheck {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: $gray-700;
+  cursor: pointer;
+
+  input {
+    accent-color: $emerald-600;
+  }
+}
+
 .summary {
   margin-top: 12px;
   display: grid;
@@ -203,4 +292,3 @@ function submit() {
   }
 }
 </style>
-
