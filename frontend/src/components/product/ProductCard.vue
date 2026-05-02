@@ -82,8 +82,14 @@ function add() {
 
 .media {
   position: relative;
-  height: 180px;
+  height: 130px;
   background: $gray-100;
+}
+
+@media (min-width: 768px) {
+  .media {
+    height: 180px;
+  }
 }
 
 .media img {

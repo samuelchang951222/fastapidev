@@ -1,24 +1,54 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 
 import { useUiStore } from '../../stores/ui'
 import { useCartStore } from '../../stores/cart'
+import { useAuthStore } from '../../stores/auth'
 import BaseButton from '../ui/BaseButton.vue'
 
 const ui = useUiStore()
 const cart = useCartStore()
+const auth = useAuthStore()
 const router = useRouter()
 
 const showBadge = computed(() => cart.totalCount > 0)
+const showUserMenu = ref(false)
 
 function goShop() {
   router.push('/shop')
 }
+
+function toggleUserMenu(e) {
+  e.stopPropagation()
+  showUserMenu.value = !showUserMenu.value
+}
+
+function handleLogout() {
+  showUserMenu.value = false
+  if (window.hmClose) window.hmClose()
+  auth.logout()
+  router.push('/')
+}
+
+function openMobileMenu() {
+  window.hmOpen()
+}
+
+function onDocumentClick(e) {
+  if (!showUserMenu.value) return
+  const wrap = document.querySelector('.userMenuWrap')
+  if (wrap && !wrap.contains(e.target)) {
+    showUserMenu.value = false
+  }
+}
+
+onMounted(() => document.addEventListener('click', onDocumentClick))
+onUnmounted(() => document.removeEventListener('click', onDocumentClick))
 </script>
 
 <template>
-  <header class="header">
+  <header class="header" @click.self="showUserMenu = false">
     <div class="container headerInner">
       <RouterLink to="/" class="brand" aria-label="鮮採市集">
         <span class="logoBox" />
@@ -61,7 +91,29 @@ function goShop() {
           <span v-if="showBadge" class="badge" aria-label="購物車數量">{{ cart.badgeText }}</span>
         </div>
 
+        <!-- 登入/使用者選單 -->
+        <div v-if="!auth.isLoggedIn" class="authLinks">
+          <RouterLink to="/login" class="navLink">登入</RouterLink>
+          <RouterLink to="/register" class="navLink registerLink">註冊</RouterLink>
+        </div>
+        <div v-else class="userMenuWrap">
+          <BaseButton variant="ghost" class="iconBtn userBtn" @click="toggleUserMenu" :title="auth.userName">
+            <span class="avatar">{{ auth.userName.charAt(0) }}</span>
+          </BaseButton>
+          <div v-if="showUserMenu" class="userDropdown" @click.stop>
+            <div class="dropdownUser">{{ auth.userName }}</div>
+            <div class="dropdownEmail">{{ auth.user?.email }}</div>
+            <hr class="dropdownDivider" />
+            <button class="dropdownItem" @click="handleLogout">登出</button>
+          </div>
+        </div>
+
         <BaseButton variant="primary" class="cta" @click="goShop">立即選購</BaseButton>
+
+        <!-- 漢堡選單按鈕（手機版）— 使用全域 JS，完全繞過 Vue component 系統 -->
+        <button class="hamburger" @click="openMobileMenu" aria-label="選單">
+          <span class="hamLine" />
+        </button>
       </div>
     </div>
   </header>
@@ -74,8 +126,7 @@ function goShop() {
   position: sticky;
   top: 0;
   z-index: 40;
-  background: rgba(255, 255, 255, 0.86);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
   border-bottom: 1px solid $gray-200;
 }
 
@@ -175,6 +226,155 @@ function goShop() {
   display: none;
 }
 
+.authLinks {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.registerLink {
+  background: $emerald-50;
+  color: $emerald-700 !important;
+}
+
+.userMenuWrap {
+  position: relative;
+}
+
+.userBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  padding: 0;
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: $emerald-600;
+  color: #fff;
+  font-weight: 900;
+  font-size: 14px;
+}
+
+.userDropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 200px;
+  background: #fff;
+  border: 1px solid $gray-200;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-lg;
+  padding: 8px;
+  z-index: 50;
+}
+
+.dropdownUser {
+  font-weight: 900;
+  padding: 4px 8px;
+  font-size: 14px;
+}
+
+.dropdownEmail {
+  color: $gray-600;
+  padding: 2px 8px 4px;
+  font-size: 13px;
+}
+
+.dropdownDivider {
+  border: none;
+  border-top: 1px solid $gray-100;
+  margin: 6px 0;
+}
+
+.dropdownItem {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $red-600;
+}
+
+.dropdownItem:hover {
+  background: $gray-100;
+}
+
+/* ── 漢堡選單（手機版） ── */
+.hamburger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 999px;
+  position: relative;
+}
+
+.hamLine,
+.hamLine::before,
+.hamLine::after {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: $gray-800;
+  border-radius: 2px;
+  transition: transform 200ms ease;
+}
+
+.hamLine {
+  position: relative;
+}
+
+.hamLine::before,
+.hamLine::after {
+  content: '';
+  position: absolute;
+  left: 0;
+}
+
+.hamLine::before {
+  top: -6px;
+}
+
+.hamLine::after {
+  top: 6px;
+}
+
+.hamLine.open {
+  background: transparent;
+}
+
+.hamLine.open::before {
+  top: 0;
+  transform: rotate(45deg);
+}
+
+.hamLine.open::after {
+  top: 0;
+  transform: rotate(-45deg);
+}
+
+/* ── 桌機隱藏漢堡選單 ── */
+@media (min-width: 768px) {
+  .hamburger {
+    display: none;
+  }
+}
+
 @media (min-width: 768px) {
   .navLinks {
     display: flex;
@@ -187,4 +387,3 @@ function goShop() {
   }
 }
 </style>
-

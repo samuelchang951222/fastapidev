@@ -1,13 +1,160 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>鮮採市集</title>
+<style>
+/* ═══════════════════════════════════════════
+   底層漢堡選單 — 不依賴 Vue / scoped / 偽元素
+   ═══════════════════════════════════════════ */
+
+/* ── 漢堡按鈕（浮動在 header 右上） ── */
+#hm-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 999px;
+  z-index: 99999999;
+}
+#hm-btn svg {
+  display: block;
+}
+
+/* ── 遮罩層 ── */
+#hm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 99999998;
+  background: rgba(0,0,0,0.3);
+  display: none;
+  justify-content: flex-end;
+}
+#hm-overlay.open {
+  display: flex;
+}
+
+/* ── 抽屜 ── */
+#hm-drawer {
+  width: 280px;
+  max-width: 85vw;
+  height: 100%;
+  background: #fff;
+  padding: 16px;
+  overflow-y: auto;
+  box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+  box-sizing: border-box;
+  transform: translateX(100%);
+  transition: transform 0.2s ease;
+}
+#hm-overlay.open #hm-drawer {
+  transform: translateX(0);
+}
+
+/* ── 關閉按鈕 ── */
+#hm-close {
+  display: block;
+  margin-left: auto;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #f3f4f6;
+  border-radius: 999px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 900;
+  color: #374151;
+}
+
+/* ── 導航連結 ── */
+#hm-nav {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+#hm-nav a {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 15px;
+  color: #1f2937;
+  text-align: left;
+  background: none;
+  text-decoration: none;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+#hm-nav a:hover { background: #f3f4f6; }
+#hm-nav a:active { background: #e5e7eb; }
+
+.hm-section {
+  padding: 8px 12px 2px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.hm-hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 8px 0;
+}
+
+/* 桌機隱藏 */
+@media (min-width: 768px) {
+  #hm-overlay { display: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<!-- ═══ 手機漢堡選單 — 純 DOM + JS 實現 ═══ -->
+<div id="hm-overlay">
+  <div id="hm-drawer" onclick="event.stopPropagation()">
+    <button id="hm-close" onclick="hmClose()">✕</button>
+    <div id="hm-nav">
+      <div class="hm-section">商品分類</div>
+      <a href="/shop?category=vegetable" onclick="hmClose()">蔬菜</a>
+      <a href="/shop?category=fruit" onclick="hmClose()">水果</a>
+      <a href="/shop?category=mushroom" onclick="hmClose()">菇類</a>
+      <a href="/shop?category=juice" onclick="hmClose()">蔬果汁</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══ 全局 JS — 無框架依賴 ═══
+function hmOpen() {
+  var o = document.getElementById('hm-overlay');
+  if (!o) return;
+  o.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function hmClose() {
+  var o = document.getElementById('hm-overlay');
+  if (!o) return;
+  o.classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') hmClose();
+});
+</script>
+
+<script type="module" src="/src/main.js"></script>
+</body>
 </html>

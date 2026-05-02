@@ -7,8 +7,10 @@ import SearchPanel from './SearchPanel.vue'
 import CartDrawer from '../cart/CartDrawer.vue'
 import ToastHost from '../ui/ToastHost.vue'
 import { useUiStore } from '../../stores/ui'
+import { useAuthStore } from '../../stores/auth'
 
 const ui = useUiStore()
+const auth = useAuthStore()
 const route = useRoute()
 
 function onKeydown(e) {
@@ -24,6 +26,12 @@ watch(
     ui.closeCart()
   },
 )
+
+// 註冊全域登出函式（給 index.html 的靜態漢堡選單用）
+window.hmLogout = function () {
+  auth.logout()
+  window.location.href = '/'
+}
 
 onMounted(() => window.addEventListener('keydown', onKeydown))
 onUnmounted(() => window.removeEventListener('keydown', onKeydown))
@@ -86,4 +94,3 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
   font-size: 14px;
 }
 </style>
-

@@ -131,10 +131,6 @@ watch([q, category, sort], () => {
             {{ c.name }}
           </button>
         </div>
-
-        <BaseButton v-if="!ui.isMemberEnabled" variant="primary" class="memberBtn" @click="ui.enableMember()">
-          加入會員享優惠
-        </BaseButton>
       </div>
 
       <div class="layout">
@@ -155,19 +151,6 @@ watch([q, category, sort], () => {
             </div>
           </section>
 
-          <section class="promo">
-            <div class="promoTitle">當季特惠</div>
-            <div v-if="!ui.isMemberEnabled" class="promoDesc">
-              加入會員即享首購 9 折優惠，還有不定時滿額贈禮！
-            </div>
-            <div v-else class="promoEnabled">
-              <span class="dot" aria-hidden="true" />
-              會員優惠已啟用
-            </div>
-            <BaseButton v-if="!ui.isMemberEnabled" variant="primary" class="promoBtn" @click="ui.enableMember()">
-              立即加入
-            </BaseButton>
-          </section>
         </aside>
 
         <section class="content">
@@ -270,8 +253,8 @@ watch([q, category, sort], () => {
 
 .flashGrid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
 }
 
 .filterBtn {
@@ -347,10 +330,6 @@ watch([q, category, sort], () => {
   color: $emerald-700;
 }
 
-.memberBtn {
-  height: 44px;
-  justify-content: center;
-}
 
 .layout {
   margin-top: 14px;
@@ -400,60 +379,7 @@ watch([q, category, sort], () => {
   color: $emerald-700;
 }
 
-.promo {
-  margin-top: 12px;
-  border: 1px solid $emerald-100;
-  border-radius: $radius-xl;
-  background: linear-gradient(135deg, $emerald-50, #fff);
-  padding: 14px;
-  display: grid;
-  gap: 10px;
-}
 
-.promoTitle {
-  font-weight: 900;
-}
-
-.promoDesc {
-  color: $gray-700;
-  font-weight: 700;
-  font-size: 14px;
-  line-height: 1.45;
-}
-
-.promoEnabled {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 900;
-  color: $emerald-700;
-}
-
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: $emerald-500;
-  box-shadow: 0 0 0 6px rgba($emerald-500, 0.18);
-  animation: pulse 1.6s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 6px rgba($emerald-500, 0.18);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba($emerald-500, 0.06);
-  }
-  100% {
-    box-shadow: 0 0 0 6px rgba($emerald-500, 0.18);
-  }
-}
-
-.promoBtn {
-  height: 44px;
-  justify-content: center;
-}
 
 .state {
   padding: 16px 0;
@@ -483,25 +409,25 @@ watch([q, category, sort], () => {
 
 .grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 768px) {
   .flashGrid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
   .grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media (min-width: 1024px) {
   .flashGrid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
   .grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
