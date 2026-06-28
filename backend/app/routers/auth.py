@@ -1,7 +1,8 @@
 from __future__ import annotations
-
 import hashlib
 import json
+import os
+import random
 import secrets
 import time
 from typing import Optional
@@ -10,6 +11,7 @@ import bcrypt
 from fastapi import APIRouter, HTTPException, Header
 from pydantic import BaseModel
 from supabase import create_client
+from twilio.rest import Client as TwilioClient
 
 from ..supabase_config import SUPABASE_KEY, SUPABASE_URL
 
@@ -20,6 +22,13 @@ _supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 # 記憶體 token 儲存: token -> user_id
 _token_store: dict[str, int] = {}
 _token_expiry: dict[str, int] = {}
+
+# OTP 儲存: normalized_phone -> (otp, expiry_epoch)
+_otp_store: dict[str, tuple[str, int]] = {}
+
+_TWILIO_SID = os.getenv("TWILIO_ACCOUNT_SID", "")
+_TWILIO_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")
+_TWILIO_FROM = os.getenv("TWILIO_PHONE_NUMBER", "")
 
 
 # ── Schema ──
@@ -46,6 +55,16 @@ class UpdateProfileRequest(BaseModel):
 class AuthResponse(BaseModel):
     token: str
     user: dict
+
+
+class PasswordResetRequestBody(BaseModel):
+    phone: str
+
+
+class PasswordResetConfirmBody(BaseModel):
+    phone: str
+    otp: str
+    new_password: str
 
 
 # ── Helper ──
@@ -120,7 +139,7 @@ def login(req: LoginRequest) -> AuthResponse:
 
 
 @router.get("/me")
-def get_me(authorization: str | None = Header(default=None)) -> dict:
+def get_me(authorization: Optional[str] = Header(default=None)) -> dict:
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="未登入")
     token = authorization[7:]
@@ -203,6 +222,87 @@ def save_cart(body: dict, authorization: str | None = Header(default=None)) -> d
     items = body.get("items", {})
     _supabase.table("users").update({"cart_data": json.dumps(items)}).eq("id", user_id).execute()
     return {"ok": True}
+
+
+# ── Password reset via SMS ──
+
+def _normalize_tw_phone(phone: str) -> str:
+    """Convert Taiwan local formats to E.164 (+886...)."""
+    p = phone.strip().replace("-", "").replace(" ", "")
+    if p.startswith("+886"):
+        return p
+    if p.startswith("886"):
+        return "+" + p
+    if p.startswith("0"):
+        return "+886" + p[1:]
+    raise ValueError("無法辨識的手機號碼格式")
+
+
+@router.post("/password-reset/request")
+def password_reset_request(req: PasswordResetRequestBody) -> dict:
+    try:
+        normalized = _normalize_tw_phone(req.phone)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    result = _supabase.table("users").select("id").eq("phone", req.phone).execute()
+    if not result.data:
+        # Also try the normalized form stored in DB
+        result = _supabase.table("users").select("id").eq("phone", normalized).execute()
+    if not result.data:
+        raise HTTPException(status_code=404, detail="找不到使用此手機號碼的帳號")
+
+    if not (_TWILIO_SID and _TWILIO_TOKEN and _TWILIO_FROM):
+        raise HTTPException(status_code=500, detail="簡訊服務尚未設定，請聯絡管理員")
+
+    otp = str(random.randint(100000, 999999))
+    _otp_store[normalized] = (otp, int(time.time()) + 600)  # 10-minute expiry
+
+    client = TwilioClient(_TWILIO_SID, _TWILIO_TOKEN)
+    client.messages.create(
+        body=f"【鮮採市集】您的密碼重設驗證碼為 {otp}，10 分鐘內有效。",
+        from_=_TWILIO_FROM,
+        to=normalized,
+    )
+
+    return {"ok": True, "detail": "驗證碼已傳送至您的手機"}
+
+
+@router.post("/password-reset/confirm")
+def password_reset_confirm(req: PasswordResetConfirmBody) -> dict:
+    try:
+        normalized = _normalize_tw_phone(req.phone)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    entry = _otp_store.get(normalized)
+    if not entry:
+        raise HTTPException(status_code=400, detail="驗證碼不存在或已過期，請重新申請")
+
+    stored_otp, expiry = entry
+    if time.time() > expiry:
+        _otp_store.pop(normalized, None)
+        raise HTTPException(status_code=400, detail="驗證碼已過期，請重新申請")
+
+    if req.otp != stored_otp:
+        raise HTTPException(status_code=400, detail="驗證碼錯誤")
+
+    if len(req.new_password) < 8:
+        raise HTTPException(status_code=400, detail="新密碼至少需要 8 個字元")
+
+    # Find user by phone (try both formats)
+    result = _supabase.table("users").select("id").eq("phone", req.phone).execute()
+    if not result.data:
+        result = _supabase.table("users").select("id").eq("phone", normalized).execute()
+    if not result.data:
+        raise HTTPException(status_code=404, detail="找不到使用此手機號碼的帳號")
+
+    user_id = result.data[0]["id"]
+    new_hash = bcrypt.hashpw(req.new_password.encode(), bcrypt.gensalt()).decode()
+    _supabase.table("users").update({"hashed_password": new_hash}).eq("id", user_id).execute()
+
+    _otp_store.pop(normalized, None)
+    return {"ok": True, "detail": "密碼已成功更新，請重新登入"}
 
 
 # ── Internal ──
