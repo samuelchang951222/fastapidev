@@ -1,4 +1,6 @@
 fastapi
 uvicorn[standard]
 pydantic
+twilio
+python-dotenv
 

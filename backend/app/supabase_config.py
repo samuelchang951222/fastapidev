@@ -2,6 +2,8 @@
 Supabase connection config.
 Do not commit the service_role key to public repos.
 """
+from dotenv import load_dotenv
+load_dotenv()
 
 SUPABASE_URL = "https://igzekhhebnvuamisualh.supabase.co"
 
