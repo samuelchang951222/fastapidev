@@ -285,7 +285,7 @@ async function submit() {
   font-weight: 800;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
   .grid {
     grid-template-columns: 1.2fr 0.8fr;
     align-items: start;

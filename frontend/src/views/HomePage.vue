@@ -141,7 +141,7 @@ function goShop() {
 @use '../styles/tokens' as *;
 
 .hero {
-  padding: 44px 0 28px;
+  padding: 28px 0 20px;
   background: radial-gradient(1000px 500px at 10% 0%, $emerald-50, transparent),
     radial-gradient(900px 500px at 80% 20%, rgba($emerald-200, 0.55), transparent);
 }
@@ -154,8 +154,8 @@ function goShop() {
 
 .heroTitle {
   margin: 0;
-  font-size: 34px;
-  line-height: 1.12;
+  font-size: 26px;
+  line-height: 1.18;
   letter-spacing: -0.2px;
 }
 
@@ -164,6 +164,8 @@ function goShop() {
   color: $gray-700;
   font-weight: 700;
   max-width: 42ch;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .heroCtas {
@@ -174,7 +176,7 @@ function goShop() {
 }
 
 .heroArt {
-  height: 220px;
+  height: 180px;
   position: relative;
 }
 
@@ -311,15 +313,15 @@ function goShop() {
   background: linear-gradient(135deg, $emerald-50, #fff);
   padding: 18px 16px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 16px;
 }
 
 .newsTitle {
   margin: 0;
   font-weight: 900;
-  font-size: 18px;
+  font-size: 17px;
 }
 
 .newsDesc {
@@ -327,9 +329,23 @@ function goShop() {
   color: $gray-600;
   font-weight: 700;
   font-size: 14px;
+  line-height: 1.5;
 }
 
 @media (min-width: 640px) {
+  .hero {
+    padding: 44px 0 28px;
+  }
+  .heroTitle {
+    font-size: 34px;
+    line-height: 1.12;
+  }
+  .heroDesc {
+    font-size: inherit;
+  }
+  .heroArt {
+    height: 220px;
+  }
   .heroInner {
     grid-template-columns: 1.1fr 0.9fr;
   }
@@ -338,6 +354,14 @@ function goShop() {
   }
   .catGrid {
     grid-template-columns: repeat(4, 1fr);
+  }
+  .newsInner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .newsTitle {
+    font-size: 18px;
   }
 }
 
