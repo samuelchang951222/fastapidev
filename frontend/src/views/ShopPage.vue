@@ -194,7 +194,7 @@ watch([q, category, sort], () => {
 
 .title {
   margin: 0;
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 900;
 }
 
@@ -432,6 +432,9 @@ watch([q, category, sort], () => {
 }
 
 @media (min-width: 768px) {
+  .title {
+    font-size: 26px;
+  }
   .filterBtn {
     display: none;
   }
