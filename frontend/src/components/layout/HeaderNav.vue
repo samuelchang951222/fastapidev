@@ -131,31 +131,31 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick))
 }
 
 .headerInner {
-  height: 72px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 18px;
+  gap: 10px;
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   font-weight: 900;
   letter-spacing: 0.2px;
 }
 
 .logoBox {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
   background: linear-gradient(135deg, $emerald-500, $emerald-700);
   box-shadow: $shadow-sm;
 }
 
 .brandText {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .navLinks {
@@ -227,7 +227,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick))
 }
 
 .authLinks {
-  display: flex;
+  display: none;
   gap: 6px;
   align-items: center;
 }
@@ -376,7 +376,22 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick))
 }
 
 @media (min-width: 768px) {
+  .headerInner {
+    height: 72px;
+    gap: 18px;
+  }
+  .logoBox {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+  }
+  .brandText {
+    font-size: 18px;
+  }
   .navLinks {
+    display: flex;
+  }
+  .authLinks {
     display: flex;
   }
 }

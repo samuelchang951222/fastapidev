@@ -77,11 +77,12 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
 }
 
 .footerInner {
-  padding: 22px 0;
+  padding: 16px 20px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  gap: 8px;
+  text-align: center;
 }
 
 .brand {
@@ -91,6 +92,17 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
 
 .meta {
   color: $gray-500;
-  font-size: 14px;
+  font-size: 13px;
+}
+
+@media (min-width: 640px) {
+  .footerInner {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 22px 20px;
+  }
+  .meta {
+    font-size: 14px;
+  }
 }
 </style>

@@ -103,7 +103,7 @@ function add() {
 }
 
 .media {
-  height: 320px;
+  height: 240px;
   border-radius: $radius-xl;
   overflow: hidden;
   border: 1px solid $gray-200;
@@ -181,6 +181,9 @@ function add() {
   .grid {
     grid-template-columns: 1fr 1fr;
     gap: 18px;
+  }
+  .media {
+    height: 320px;
   }
   .addBtn {
     width: fit-content;

@@ -82,8 +82,14 @@ function add() {
 
 .media {
   position: relative;
-  height: 130px;
+  height: 120px;
   background: $gray-100;
+}
+
+@media (min-width: 480px) {
+  .media {
+    height: 150px;
+  }
 }
 
 @media (min-width: 768px) {
@@ -107,44 +113,44 @@ function add() {
 
 .badge {
   position: absolute;
-  top: 12px;
-  left: 12px;
-  padding: 6px 10px;
+  top: 8px;
+  left: 8px;
+  padding: 4px 8px;
   border-radius: 999px;
   background: $red-500;
   color: #fff;
   font-weight: 900;
-  font-size: 12px;
+  font-size: 11px;
   box-shadow: $shadow-sm;
 }
 
 .body {
-  padding: 14px 14px 12px;
+  padding: 10px 10px 8px;
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .tag {
   display: inline-flex;
   align-items: center;
-  padding: 4px 10px;
+  padding: 3px 8px;
   border-radius: 999px;
   background: $gray-100;
   color: $gray-700;
   font-weight: 800;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .name {
   font-weight: 900;
-  font-size: 16px;
+  font-size: 14px;
   color: $gray-900;
 }
 
 .desc {
   color: $gray-600;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -153,13 +159,13 @@ function add() {
 }
 
 .foot {
-  padding: 0 14px 14px;
+  padding: 0 10px 10px;
   margin-top: auto;
 }
 
 .addBtn {
   width: 100%;
-  height: 44px;
+  height: 40px;
   justify-content: center;
 }
 
@@ -173,6 +179,32 @@ function add() {
 }
 
 @media (min-width: 640px) {
+  .badge {
+    top: 12px;
+    left: 12px;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  .body {
+    padding: 14px 14px 12px;
+    gap: 8px;
+  }
+  .tag {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+  .name {
+    font-size: 16px;
+  }
+  .desc {
+    font-size: 13px;
+  }
+  .foot {
+    padding: 0 14px 14px;
+  }
+  .addBtn {
+    height: 44px;
+  }
   .text {
     display: inline;
   }
