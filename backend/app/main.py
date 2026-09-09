@@ -4,11 +4,11 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from supabase import create_client
 
+from .frontend import serve_frontend
 from .routers import auth, categories, flash_sales, orders, products
 from .supabase_config import SUPABASE_KEY, SUPABASE_URL
 
@@ -49,15 +49,7 @@ def create_app() -> FastAPI:
         # SPA fallback — 所有非 API 路由都導到 index.html
         @app.get("/{full_path:path}")
         async def spa_fallback(full_path: str):
-            # API / health 路由不要攔
-            if full_path.startswith(("api/", "health")):
-                return JSONResponse(status_code=404, content={"detail": "Not Found"})
-            # 有實際檔案的也先放行
-            static_file = build_dir / full_path
-            if static_file.exists() and static_file.is_file():
-                return FileResponse(str(static_file))
-            # 其餘一律回 index.html（Vue Router SPA）
-            return FileResponse(str(build_dir / "index.html"))
+            return serve_frontend(build_dir, full_path)
 
         print(f"✅ 前端靜態檔已掛載 ({build_dir})")
 
@@ -76,5 +68,4 @@ try:
     ).execute()
 except Exception:
     pass
-
 
